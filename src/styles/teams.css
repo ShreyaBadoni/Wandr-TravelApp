@@ -1,0 +1,780 @@
+/* ============================
+   WANDR — TEAMS PAGE STYLES
+   ============================ */
+
+/* Page header with action buttons */
+.teams-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.teams-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.teams-empty {
+  text-align: center;
+  padding: 100px 40px;
+  animation: wFadeUp 0.6s ease both;
+}
+
+.teams-empty-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.teams-empty h3 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin: 0 0 10px;
+}
+
+.teams-empty p {
+  font-size: 15px;
+  color: rgba(245, 240, 232, 0.5);
+  margin: 0 0 36px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
+}
+
+.teams-empty-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Teams grid */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.team-card {
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.1);
+  border-radius: 18px;
+  padding: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: wFadeUp 0.6s calc(var(--i, 0) * 0.08s) ease both;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(196,98,45,0.08), rgba(212,168,83,0.04));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.team-card:hover {
+  border-color: rgba(196, 98, 45, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.team-card:hover::before { opacity: 1; }
+
+.team-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.team-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #c4622d, #d4a853);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Playfair Display", serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.team-avatar.large {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+  border-radius: 18px;
+  margin: 0 auto 8px;
+}
+
+.team-owner-badge {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(196, 98, 45, 0.15);
+  border: 1px solid rgba(196, 98, 45, 0.3);
+  color: #c4622d;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+
+.team-card-name {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-desc {
+  font-size: 13px;
+  color: rgba(245, 240, 232, 0.45);
+  line-height: 1.5;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.team-member-count {
+  font-size: 13px;
+  color: rgba(245, 240, 232, 0.5);
+}
+
+.team-code-badge {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  color: rgba(245, 240, 232, 0.3);
+  font-family: monospace;
+  background: rgba(245, 240, 232, 0.05);
+  border: 1px solid rgba(245, 240, 232, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* Modal */
+.teams-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 5, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+.teams-modal {
+  background: #211a13;
+  border: 1px solid rgba(245, 240, 232, 0.12);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: modalSlide 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196,98,45,0.3) transparent;
+}
+
+@keyframes modalSlide {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.modal-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: #c4622d;
+}
+
+.modal-header h2 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin: 0 0 6px;
+}
+
+.modal-header p {
+  font-size: 14px;
+  color: rgba(245, 240, 232, 0.5);
+  margin: 0;
+}
+
+/* Join code input */
+.join-code-input {
+  font-size: 22px !important;
+  letter-spacing: 0.3em;
+  text-align: center;
+  font-family: monospace !important;
+  text-transform: uppercase;
+}
+
+/* Code display row */
+.team-code-row {
+  margin-bottom: 20px;
+}
+
+.team-code-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  background: rgba(245, 240, 232, 0.05);
+  border: 1px solid rgba(245, 240, 232, 0.12);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+.team-code-display span {
+  flex: 1;
+  font-family: monospace;
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  font-weight: 700;
+  color: #c4622d;
+}
+
+.copy-btn {
+  background: rgba(196, 98, 45, 0.15);
+  border: 1px solid rgba(196, 98, 45, 0.3);
+  color: #c4622d;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.04em;
+}
+
+.copy-btn:hover {
+  background: rgba(196, 98, 45, 0.25);
+}
+
+/* Members list */
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.07);
+  border-radius: 10px;
+}
+
+.member-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c4622d, #d4a853);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Playfair Display", serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.member-info { flex: 1; min-width: 0; }
+
+.member-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f5f0e8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-email {
+  font-size: 12px;
+  color: rgba(245, 240, 232, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pending invites */
+.pending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pending-row {
+  font-size: 13px;
+  color: rgba(245, 240, 232, 0.5);
+  padding: 8px 14px;
+  background: rgba(212, 168, 83, 0.06);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Invite row */
+.invite-section {
+  margin: 20px 0;
+}
+
+.invite-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.invite-row .wandr-input {
+  flex: 1;
+}
+
+.invite-send-btn {
+  padding: 13px 20px !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Danger row */
+.modal-danger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(245, 240, 232, 0.08);
+}
+
+.danger-btn {
+  background: rgba(224, 92, 92, 0.1);
+  border: 1px solid rgba(224, 92, 92, 0.25);
+  color: #e05c5c;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.danger-btn:hover {
+  background: rgba(224, 92, 92, 0.2);
+  border-color: rgba(224, 92, 92, 0.5);
+}
+
+@media (max-width: 600px) {
+  .teams-header { flex-direction: column; align-items: flex-start; }
+  .teams-modal { padding: 28px 24px; }
+  .teams-empty-actions { flex-direction: column; align-items: center; }
+  .modal-danger-row { flex-direction: column; gap: 10px; }
+}
+
+/* ── Vacation banner on card ── */
+.team-vacation-banner {
+  background: linear-gradient(135deg, rgba(196,98,45,0.2), rgba(212,168,83,0.15));
+  border: 1px solid rgba(196,98,45,0.3);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #d4a853;
+  font-weight: 500;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.team-card-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.team-locked-badge {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  background: rgba(245,240,232,0.07);
+  border: 1px solid rgba(245,240,232,0.15);
+  color: rgba(245,240,232,0.5);
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+
+.team-live-badge {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(122,158,126,0.15);
+  border: 1px solid rgba(122,158,126,0.35);
+  color: #7a9e7e;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+
+/* ── Modal vacation active banner ── */
+.modal-vacation-active {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(196,98,45,0.12), rgba(212,168,83,0.08));
+  border: 1px solid rgba(196,98,45,0.25);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.modal-vacation-dest {
+  font-family: "Playfair Display", serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #f5f0e8;
+}
+
+.modal-vacation-since {
+  font-size: 12px;
+  color: rgba(245,240,232,0.45);
+  margin-top: 2px;
+}
+
+/* ── Owner controls ── */
+.owner-controls {
+  margin-bottom: 20px;
+}
+
+.owner-controls-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.control-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+  text-align: center;
+}
+
+.control-btn-lock {
+  background: rgba(245,240,232,0.05);
+  border-color: rgba(245,240,232,0.2);
+  color: rgba(245,240,232,0.7);
+}
+.control-btn-lock:hover {
+  background: rgba(245,240,232,0.1);
+  border-color: rgba(245,240,232,0.4);
+  color: #f5f0e8;
+}
+
+.control-btn-unlock {
+  background: rgba(122,158,126,0.1);
+  border-color: rgba(122,158,126,0.35);
+  color: #7a9e7e;
+}
+.control-btn-unlock:hover {
+  background: rgba(122,158,126,0.2);
+}
+
+.control-btn-vacation {
+  background: rgba(196,98,45,0.12);
+  border-color: rgba(196,98,45,0.35);
+  color: #c4622d;
+}
+.control-btn-vacation:hover {
+  background: rgba(196,98,45,0.22);
+}
+
+.control-btn-end {
+  background: rgba(212,168,83,0.1);
+  border-color: rgba(212,168,83,0.3);
+  color: #d4a853;
+}
+.control-btn-end:hover {
+  background: rgba(212,168,83,0.2);
+}
+
+/* ── Info box ── */
+.modal-info-box {
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.1);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: rgba(245,240,232,0.5);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.modal-info-box strong { color: rgba(245,240,232,0.8); }
+
+/* ── Dashboard additions ── */
+.db-section { margin-bottom: 28px; }
+
+.db-section-title {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-bottom: 14px;
+}
+
+.vacation-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.vacation-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(196,98,45,0.15), rgba(212,168,83,0.08));
+  border: 1px solid rgba(196,98,45,0.3);
+  border-radius: 18px;
+  padding: 24px 28px;
+  overflow: hidden;
+  animation: wFadeUp 0.6s ease both;
+}
+
+.vacation-pulse {
+  position: absolute;
+  top: 20px; right: 20px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #7a9e7e;
+  box-shadow: 0 0 0 0 rgba(122,158,126,0.5);
+  animation: vacPulse 2s infinite;
+}
+
+@keyframes vacPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(122,158,126,0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(122,158,126,0); }
+  100% { box-shadow: 0 0 0 0 rgba(122,158,126,0); }
+}
+
+.vacation-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.vacation-live-badge {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #7a9e7e;
+  text-transform: uppercase;
+}
+
+.vacation-team-name {
+  font-size: 13px;
+  color: rgba(245,240,232,0.5);
+}
+
+.vacation-destination {
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-bottom: 8px;
+}
+
+.vacation-meta {
+  font-size: 12px;
+  color: rgba(245,240,232,0.4);
+  margin-bottom: 16px;
+}
+
+.vacation-members {
+  display: flex;
+  gap: -6px;
+}
+
+.vacation-member-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c4622d, #d4a853);
+  border: 2px solid #1a1510;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  margin-right: -8px;
+  font-family: "Playfair Display", serif;
+}
+
+.vacation-member-avatar.more {
+  background: rgba(245,240,232,0.1);
+  color: rgba(245,240,232,0.6);
+  font-family: "DM Sans", sans-serif;
+  font-size: 9px;
+}
+
+.db-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.db-card-header .wandr-card-title { margin: 0; }
+
+.db-see-all {
+  background: none;
+  border: none;
+  color: #c4622d;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.db-see-all:hover { color: #d4714a; }
+
+.db-teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.db-team-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(245,240,232,0.03);
+  border: 1px solid rgba(245,240,232,0.07);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: wFadeUp 0.5s calc(var(--i,0)*0.06s) ease both;
+}
+
+.db-team-row:hover {
+  background: rgba(196,98,45,0.07);
+  border-color: rgba(196,98,45,0.2);
+}
+
+.db-team-avatar {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #c4622d, #d4a853);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Playfair Display", serif;
+  font-size: 13px; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+
+.db-team-info { flex: 1; }
+
+.db-team-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #f5f0e8;
+}
+
+.db-team-meta {
+  font-size: 12px;
+  color: rgba(245,240,232,0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.db-vacation-pill {
+  background: rgba(196,98,45,0.15);
+  color: #c4622d;
+  border-radius: 100px;
+  padding: 1px 8px;
+  font-size: 11px;
+}
+
+.db-team-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.db-lock-badge { font-size: 14px; }
+
+.db-active-badge {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #7a9e7e;
+  background: rgba(122,158,126,0.1);
+  border: 1px solid rgba(122,158,126,0.25);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.db-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(245,240,232,0.4);
+}
+.db-empty p { margin-bottom: 16px; font-size: 14px; }

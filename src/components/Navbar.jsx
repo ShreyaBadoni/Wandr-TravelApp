@@ -1,39 +1,3 @@
-// import { useNavigate } from "react-router-dom";
-
-// function Navbar({toggleTheme}) {
-//   const navigate = useNavigate();
-
-//   const logout = () => {
-//     localStorage.removeItem("isLoggedIn");
-//     navigate("/login");
-//   };
-
-//   return (
-//     <div style={{ background: "#333", padding: "10px", color: "white" }}>
-//       <span style={{ marginRight: "20px", cursor: "pointer" }} onClick={() => navigate("/dashboard")}>
-//         Dashboard
-//       </span>
-
-//       <span style={{ marginRight: "20px", cursor: "pointer" }} onClick={() => navigate("/profile")}>
-//         Profile
-//       </span>
-     
-//      <button onClick={() => toggleTheme && toggleTheme()}>
-//   Toggle Theme
-// </button>
-// <button
-//   className="auth-btn"
-//   onClick={() => navigate("/signup")}
-// >
-//   Logout
-// </button>
-
-
-//     </div>
-//   );
-// }
-
-// export default Navbar;
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/dashboard.css";
 
@@ -52,6 +16,12 @@ function Navbar({ toggleTheme }) {
     ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : "W";
 
+  const navLinks = [
+    { path: "/dashboard", label: "Dashboard" },
+    { path: "/teams", label: "Teams" },
+    { path: "/profile", label: "Profile" },
+  ];
+
   return (
     <nav className="wandr-nav">
       <div className="wandr-nav-left">
@@ -60,18 +30,15 @@ function Navbar({ toggleTheme }) {
           <span className="wandr-logo-text">Wandr</span>
         </div>
         <div className="wandr-nav-links">
-          <button
-            className={`wandr-nav-link ${location.pathname === "/dashboard" ? "active" : ""}`}
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </button>
-          <button
-            className={`wandr-nav-link ${location.pathname === "/profile" ? "active" : ""}`}
-            onClick={() => navigate("/profile")}
-          >
-            Profile
-          </button>
+          {navLinks.map((link) => (
+            <button
+              key={link.path}
+              className={`wandr-nav-link ${location.pathname === link.path ? "active" : ""}`}
+              onClick={() => navigate(link.path)}
+            >
+              {link.label}
+            </button>
+          ))}
         </div>
       </div>
 
