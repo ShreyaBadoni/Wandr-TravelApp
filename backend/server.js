@@ -70,14 +70,22 @@ if (!process.env.EMAIL_FROM) console.warn("⚠️  WARNING: EMAIL_FROM is not se
 // EMAIL_FROM should be a verified sender address in Brevo dashboard.
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
-  port: 587,
+  port: 2525,
   secure: false,
+  requireTLS: true,
+
   auth: {
     user: process.env.BREVO_USER,
     pass: process.env.BREVO_PASS,
   },
+
+  connectionTimeout: 60000,
+  greetingTimeout: 60000,
+  socketTimeout: 60000,
+
   tls: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false,
+    minVersion: "TLSv1.2"
   }
 });
 
@@ -106,10 +114,18 @@ app.get("/test-mail", async (req, res) => {
     });
     res.json({ success: true, message: "Test email sent successfully" });
   } catch (err) {
-    console.error("MAIL ERROR:", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
+  console.error("FULL MAIL ERROR:");
+  console.error(err);
+
+  res.status(500).json({
+    success: false,
+    error: err.message,
+    code: err.code,
+    command: err.command
+  });
+}
 });
+
 
 // ── AUTH ROUTES ───────────────────────────────────────────────
 
