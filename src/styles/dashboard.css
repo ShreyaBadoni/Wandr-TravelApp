@@ -535,3 +535,333 @@
   .wandr-card { padding: 28px 24px; }
   .wandr-btn-row { flex-direction: column; }
 }
+
+
+/* ============================================================
+   WANDR — POLISH UPDATE
+   Refined micro-interactions, depth, and visual consistency
+   ============================================================ */
+
+/* ── Navbar refinements ── */
+.wandr-nav {
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.wandr-nav-logo:hover .wandr-logo-text {
+  color: #c4622d;
+  transition: color 0.2s;
+}
+
+.wandr-nav-link {
+  position: relative;
+  transition: color 0.2s, background 0.2s;
+}
+
+.wandr-nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  background: #c4622d;
+  border-radius: 2px;
+}
+
+/* ── Improved stat cards ── */
+.wandr-stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.wandr-stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(196,98,45,0.06), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: inherit;
+}
+
+.wandr-stat-card:hover::before { opacity: 1; }
+
+.wandr-stat-value {
+  background: linear-gradient(135deg, #d4a853, #e8c070);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Card glow on hover ── */
+.wandr-card {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.wandr-card:hover {
+  border-color: rgba(196,98,45,0.2);
+  box-shadow: 0 0 0 1px rgba(196,98,45,0.08), 0 20px 60px rgba(0,0,0,0.2);
+}
+
+/* ── Primary button glow ── */
+.wandr-btn-primary {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(196,98,45,0.2);
+}
+
+.wandr-btn-primary::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transition: left 0.4s ease;
+}
+
+.wandr-btn-primary:hover:not(:disabled)::after { left: 150%; }
+
+.wandr-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 8px 30px rgba(196,98,45,0.45);
+}
+
+/* ── Ghost button ── */
+.wandr-btn-ghost {
+  transition: all 0.2s;
+}
+
+.wandr-btn-ghost:hover {
+  background: rgba(245,240,232,0.06);
+}
+
+/* ── Input focus ring ── */
+.wandr-input {
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.wandr-input:focus {
+  box-shadow: 0 0 0 3px rgba(196,98,45,0.15);
+}
+
+/* ── Modal polish ── */
+.teams-modal-backdrop {
+  backdrop-filter: blur(6px);
+  animation: backdropIn 0.2s ease both;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.teams-modal {
+  animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,240,232,0.08);
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Scrollbar styling ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196,98,45,0.25) transparent;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(196,98,45,0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(196,98,45,0.45); }
+
+/* ── Page orbs — more vivid ── */
+.wandr-bg-orb-1 {
+  opacity: 0.18;
+  animation: orbDrift1 18s ease-in-out infinite alternate;
+}
+
+.wandr-bg-orb-2 {
+  opacity: 0.12;
+  animation: orbDrift2 22s ease-in-out infinite alternate;
+}
+
+@keyframes orbDrift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-30px, 40px) scale(1.08); }
+}
+
+@keyframes orbDrift2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(40px, -25px) scale(1.12); }
+}
+
+/* ── Loading spinner refinement ── */
+.wandr-spinner {
+  border-width: 3px;
+  border-top-color: #c4622d;
+  box-shadow: 0 0 12px rgba(196,98,45,0.3);
+}
+
+/* ── Live / status badges ── */
+.team-live-badge {
+  position: relative;
+}
+
+.team-live-badge::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: rgba(122,158,126,0.15);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50%       { opacity: 1; transform: scale(1.05); }
+}
+
+/* ── Select dropdown ── */
+.wandr-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(245,240,232,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px !important;
+  cursor: pointer;
+}
+
+/* ── Page title gradient ── */
+.wandr-page-title em {
+  background: linear-gradient(135deg, #c4622d, #e07a40);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+}
+
+/* ── Welcome card shimmer ── */
+.wandr-welcome {
+  position: relative;
+  overflow: hidden;
+}
+
+.wandr-welcome::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* ── Fade-up stagger refinement ── */
+@keyframes wFadeUp {
+  from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+/* ── bills/summary cards accent line ── */
+.bills-summary-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.bills-summary-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #c4622d, #d4a853);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.bills-summary-card:hover::after { transform: scaleX(1); }
+
+/* ── Team/bill card hover lift ── */
+.team-card,
+.hotel-card,
+.trip-card,
+.explore-card,
+.trip-bill-row {
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+/* ── Empty state icon bounce ── */
+.teams-empty-icon {
+  display: inline-block;
+  animation: iconBounce 3s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ── Danger button ── */
+.danger-btn {
+  background: rgba(224,92,92,0.08);
+  border: 1px solid rgba(224,92,92,0.2);
+  color: rgba(224,92,92,0.8);
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.danger-btn:hover {
+  background: rgba(224,92,92,0.15);
+  border-color: rgba(224,92,92,0.4);
+  color: #e05c5c;
+}
+
+/* ── Code/invite badge ── */
+.team-code-badge {
+  font-family: "SF Mono", "Fira Code", monospace;
+  letter-spacing: 0.15em;
+}
+
+/* ── Toasts ── */
+.Toastify__toast {
+  font-family: "DM Sans", sans-serif !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+}
+
+/* ── Mobile bottom padding ── */
+@media (max-width: 768px) {
+  .wandr-page-content { padding-bottom: 80px; }
+
+  .wandr-stat-card { padding: 20px; }
+  .wandr-stat-value { font-size: 24px; }
+
+  .teams-modal {
+    border-radius: 24px 24px 0 0;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSheetUp 0.3s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+  }
+
+  @keyframes modalSheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+}

@@ -2,13 +2,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/dashboard.css";
 
 function Navbar({ toggleTheme }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const name = localStorage.getItem("userName") || "";
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const name      = localStorage.getItem("userName") || "";
+  const avatarSrc = localStorage.getItem("userAvatar") || "";
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
+    localStorage.removeItem("userAvatar");
     navigate("/login");
   };
 
@@ -18,8 +20,11 @@ function Navbar({ toggleTheme }) {
 
   const navLinks = [
     { path: "/dashboard", label: "Dashboard" },
-    { path: "/teams", label: "Teams" },
-    { path: "/profile", label: "Profile" },
+    { path: "/teams",     label: "Teams"     },
+    { path: "/chat",      label: "Chat"      },
+    { path: "/explore",   label: "Explore"   },
+    { path: "/bills",     label: "Bills"     },
+    { path: "/profile",   label: "Profile"   },
   ];
 
   return (
@@ -44,7 +49,12 @@ function Navbar({ toggleTheme }) {
 
       <div className="wandr-nav-right">
         <div className="wandr-nav-user">
-          <div className="wandr-avatar">{initials}</div>
+          <div className="wandr-avatar">
+            {avatarSrc
+              ? <img src={avatarSrc} alt="avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+              : initials
+            }
+          </div>
           {name && <span className="wandr-username">{name}</span>}
         </div>
         <button className="wandr-logout-btn" onClick={logout}>

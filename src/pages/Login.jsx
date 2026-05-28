@@ -1,77 +1,3 @@
-// import {useState} from "react";
-// import {useNavigate} from "react-router-dom";
-// import { useEffect } from "react";
-// import { toast } from "react-toastify";
-// import axios from "axios";
-// import "../styles/auth.css"
-// function Login() {
-  
-  
-//  const[email,setEmail]=useState("");
-//  const[password,setPassword]=useState("");
-//  const [loading,setLoading]=useState(false);
-//  const navigate=useNavigate();
-  
-  
-//  const handleLogin=async ()=>{
-  
-//   if(email==""||password==""){
-//     toast.error("fill all fields");
-//     return;
-//   }
-//   try{
-//   setLoading(true);
-  
-// const res=await axios.post("http://localhost:5001/login", {
-
-//         email,
-//         password
-//       });
-//   localStorage.setItem("token",res.data.token);
-//   toast.success("login success");
-//   console.log(localStorage.getItem("token"));
-//   navigate("/dashboard");
-//     }
-//   catch(error){
-//       console.log(error.response?.data);
-//     }
-//   finally{
-//         setLoading(false);
-//       }
-//     };
-// return (
-//   <div className="auth-container">
-//     <div className="auth-card">
-//       <h2>Login</h2>
-
-//       <input
-//         className="auth-input"
-//         type="email"
-//         placeholder="Email"
-//         value={email}
-//         onChange={(e) => setEmail(e.target.value)}
-//       />
-
-//       <input
-//         className="auth-input"
-//         type="password"
-//         placeholder="Password"
-//         value={password}
-//         onChange={(e) => setPassword(e.target.value)}
-//       />
-
-//       <button className="auth-btn" onClick={handleLogin} disabled={loading}>
-//         {loading ? "Logging in..." : "Login"}
-//       </button>
-
-//       <p className="auth-link" onClick={() => navigate("/signup")}>
-//         Create Account
-//       </p>
-//     </div>
-//   </div>
-// );
-// }
-// export default Login;
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -153,6 +79,12 @@ function Login() {
           <button className="auth-btn" onClick={handleLogin} disabled={loading}>
             {loading ? "Signing in..." : "Sign In →"}
           </button>
+
+          <p className="auth-link" style={{ textAlign:"center" }}>
+            <span onClick={() => navigate("/forgot-password")} style={{ color:"rgba(245,240,232,0.4)", fontSize:13, cursor:"pointer" }}>
+              Forgot your password?
+            </span>
+          </p>
 
           <p className="auth-link">
             New to Wandr?{" "}

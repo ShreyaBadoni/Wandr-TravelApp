@@ -1,0 +1,532 @@
+/* ============================
+   WANDR — BILLS PAGE STYLES
+   ============================ */
+
+.bills-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Team selector tabs */
+.bills-team-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.bills-team-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.1);
+  color: rgba(245,240,232,0.5);
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 18px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bills-team-tab:hover {
+  border-color: rgba(245,240,232,0.25);
+  color: #f5f0e8;
+}
+
+.bills-team-tab.active {
+  background: rgba(196,98,45,0.15);
+  border-color: rgba(196,98,45,0.4);
+  color: #f5f0e8;
+}
+
+.bills-live-dot {
+  color: #7a9e7e;
+  font-size: 8px;
+}
+
+.bills-team-members {
+  background: rgba(245,240,232,0.1);
+  border-radius: 100px;
+  padding: 1px 7px;
+  font-size: 11px;
+  color: rgba(245,240,232,0.4);
+}
+
+/* Summary cards */
+.bills-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.bills-summary-card {
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 14px;
+  padding: 22px 24px;
+  animation: wFadeUp 0.5s ease both;
+  transition: border-color 0.2s;
+}
+
+.bills-summary-card.total  { border-color: rgba(245,240,232,0.1); }
+.bills-summary-card.owe    { border-color: rgba(224,92,92,0.2); }
+.bills-summary-card.owed   { border-color: rgba(122,158,126,0.2); }
+.bills-summary-card.mine   { border-color: rgba(212,168,83,0.2); }
+
+.bsc-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.4);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.bsc-value {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-bottom: 4px;
+}
+
+.bsc-value.red   { color: #e05c5c; }
+.bsc-value.green { color: #7a9e7e; }
+.bsc-value.gold  { color: #d4a853; }
+
+.bsc-sub {
+  font-size: 12px;
+  color: rgba(245,240,232,0.35);
+}
+
+/* Tabs */
+.bills-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(245,240,232,0.08);
+  padding-bottom: 0;
+}
+
+.bills-tab {
+  background: none;
+  border: none;
+  color: rgba(245,240,232,0.45);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 18px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bills-tab.active {
+  color: #f5f0e8;
+}
+
+.bills-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 2px;
+  background: #c4622d;
+  border-radius: 2px 2px 0 0;
+}
+
+.bills-tab-count {
+  background: rgba(245,240,232,0.08);
+  border-radius: 100px;
+  padding: 1px 8px;
+  font-size: 11px;
+  color: rgba(245,240,232,0.4);
+}
+
+.bills-tab.active .bills-tab-count {
+  background: rgba(196,98,45,0.2);
+  color: #c4622d;
+}
+
+/* Bills list */
+.bills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bill-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: rgba(245,240,232,0.03);
+  border: 1px solid rgba(245,240,232,0.07);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: wFadeUp 0.5s calc(var(--i,0)*0.05s) ease both;
+}
+
+.bill-row:hover {
+  background: rgba(196,98,45,0.06);
+  border-color: rgba(196,98,45,0.2);
+}
+
+.bill-cat-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+
+.bill-info { flex: 1; min-width: 0; }
+
+.bill-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #f5f0e8;
+  margin-bottom: 4px;
+}
+
+.bill-meta {
+  font-size: 12px;
+  color: rgba(245,240,232,0.4);
+  margin-bottom: 8px;
+}
+
+.bill-meta strong { color: rgba(245,240,232,0.65); }
+
+.bill-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bill-progress-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(245,240,232,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.bill-progress-fill {
+  height: 100%;
+  background: #7a9e7e;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.bill-progress-label {
+  font-size: 11px;
+  color: rgba(245,240,232,0.3);
+  white-space: nowrap;
+}
+
+.bill-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bill-amount {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5f0e8;
+}
+
+.bill-split {
+  font-size: 11px;
+  color: rgba(245,240,232,0.35);
+  margin-bottom: 8px;
+}
+
+.bill-settled-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a9e7e;
+  background: rgba(122,158,126,0.12);
+  border: 1px solid rgba(122,158,126,0.25);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.bill-pending-badge {
+  display: inline-block;
+  font-size: 11px;
+  color: rgba(245,240,232,0.3);
+  background: rgba(245,240,232,0.05);
+  border: 1px solid rgba(245,240,232,0.1);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.bill-settle-btn {
+  background: rgba(196,98,45,0.12);
+  border: 1px solid rgba(196,98,45,0.3);
+  color: #c4622d;
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.bill-settle-btn:hover {
+  background: rgba(196,98,45,0.22);
+}
+
+/* Settlements */
+.settlements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settlement-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  background: rgba(245,240,232,0.03);
+  border: 1px solid rgba(245,240,232,0.07);
+  border-radius: 14px;
+  animation: wFadeUp 0.5s calc(var(--i,0)*0.06s) ease both;
+  transition: border-color 0.2s;
+}
+
+.settlement-row[style*="--highlight: 1"] {
+  border-color: rgba(224,92,92,0.2);
+  background: rgba(224,92,92,0.04);
+}
+
+.settlement-avatars {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.s-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Playfair Display", serif;
+  font-size: 12px; font-weight: 700; color: white;
+}
+
+.s-avatar.from { background: linear-gradient(135deg, #e05c5c, #c44); }
+.s-avatar.to   { background: linear-gradient(135deg, #7a9e7e, #5a8060); }
+
+.settlement-arrow {
+  font-size: 16px;
+  color: rgba(245,240,232,0.25);
+}
+
+.settlement-info { flex: 1; }
+
+.settlement-text {
+  font-size: 14px;
+  color: rgba(245,240,232,0.7);
+}
+
+.settlement-text strong { color: #f5f0e8; }
+
+.settlement-amount {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-top: 4px;
+}
+
+.you-owe-badge {
+  font-size: 11px; font-weight: 600;
+  background: rgba(224,92,92,0.12);
+  border: 1px solid rgba(224,92,92,0.25);
+  color: #e05c5c;
+  padding: 4px 12px; border-radius: 100px;
+}
+
+.owed-badge {
+  font-size: 11px; font-weight: 600;
+  background: rgba(122,158,126,0.12);
+  border: 1px solid rgba(122,158,126,0.25);
+  color: #7a9e7e;
+  padding: 4px 12px; border-radius: 100px;
+}
+
+/* Empty */
+.bills-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(245,240,232,0.35);
+  font-size: 15px;
+}
+
+.bills-empty div { font-size: 48px; margin-bottom: 16px; }
+
+/* Bill form */
+.bills-modal { max-width: 520px; }
+
+.bill-form-grid { display: flex; flex-direction: column; gap: 4px; }
+
+.bill-amount-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.bill-amount-row .flex-1 { flex: 1; }
+
+.wandr-select {
+  cursor: pointer;
+  appearance: none;
+}
+
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cat-pill {
+  background: rgba(245,240,232,0.05);
+  border: 1px solid rgba(245,240,232,0.12);
+  color: rgba(245,240,232,0.5);
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  padding: 6px 13px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-pill:hover {
+  border-color: rgba(245,240,232,0.3);
+  color: #f5f0e8;
+}
+
+.cat-pill.active {
+  background: rgba(196,98,45,0.15);
+  border-color: rgba(196,98,45,0.4);
+  color: #f5f0e8;
+}
+
+/* Split members */
+.split-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.split-member-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.12);
+  border-radius: 100px;
+  padding: 6px 12px 6px 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: rgba(245,240,232,0.6);
+}
+
+.split-member-chip:hover {
+  border-color: rgba(245,240,232,0.3);
+}
+
+.split-member-chip.checked {
+  background: rgba(122,158,126,0.12);
+  border-color: rgba(122,158,126,0.35);
+  color: #f5f0e8;
+}
+
+.smc-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c4622d, #d4a853);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: white;
+  font-family: "Playfair Display", serif;
+}
+
+.smc-check { color: #7a9e7e; font-size: 12px; font-weight: 700; }
+
+.split-preview {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(122,158,126,0.08);
+  border: 1px solid rgba(122,158,126,0.2);
+  border-radius: 10px;
+  font-size: 13px;
+  color: rgba(245,240,232,0.6);
+}
+
+.split-preview strong { color: #7a9e7e; font-size: 15px; }
+
+/* Bill detail */
+.bill-detail-amount {
+  text-align: center;
+  padding: 20px;
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.bda-total {
+  font-family: "Playfair Display", serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #f5f0e8;
+}
+
+.bda-split {
+  font-size: 13px;
+  color: rgba(245,240,232,0.45);
+  margin-top: 6px;
+}
+
+.bda-split strong { color: #d4a853; }
+
+.bill-paidby-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 15px;
+  color: #f5f0e8;
+}
+
+.bill-note {
+  font-size: 14px;
+  color: rgba(245,240,232,0.5);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(245,240,232,0.06);
+  font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .bills-summary { grid-template-columns: 1fr 1fr; }
+  .bill-row { flex-wrap: wrap; }
+  .bill-right { width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; }
+}

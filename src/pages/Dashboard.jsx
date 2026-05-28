@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "../styles/dashboard.css";
+import UserAvatar from "../components/UserAvatar";
 
 function Dashboard({ toggleTheme }) {
   const [name, setName]       = useState("");
@@ -85,8 +86,8 @@ function Dashboard({ toggleTheme }) {
                       </div>
                       <div className="vacation-members">
                         {team.members.slice(0, 5).map(m => (
-                          <div className="vacation-member-avatar" key={m.user._id} title={m.user.name}>
-                            {m.user.name?.slice(0, 2).toUpperCase()}
+                          <div key={m.user._id} title={m.user.name} style={{ marginRight: -8 }}>
+                          <UserAvatar user={m.user} size={30} />
                           </div>
                         ))}
                         {team.members.length > 5 && (

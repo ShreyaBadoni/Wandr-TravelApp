@@ -1,19 +1,30 @@
-const express = require("express");
-const cors = require("cors");
+const express  = require("express");
+const cors     = require("cors");
 require("dotenv").config();
 const mongoose = require("mongoose");
-const app = express();
-const User = require("./models/User");
-const Team = require("./models/Team");
-const jwt = require("jsonwebtoken");
+const http     = require("http");
+const { Server } = require("socket.io");
+const app      = express();
+const server   = http.createServer(app);
+const io       = new Server(server, {
+  cors: { origin: "*", methods: ["GET", "POST"] }
+});
+const User    = require("./models/User");
+const Team    = require("./models/Team");
+const Message = require("./models/Message");
+const jwt     = require("jsonwebtoken");
 const authMiddleware = require("./middleware/auth");
-const bcrypt = require("bcrypt");
+const bcrypt  = require("bcrypt");
 const nodemailer = require("nodemailer");
+const Groq = require("groq-sdk");
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 const PORT = process.env.PORT || 5001;
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("mongodb connected"))
@@ -67,11 +78,91 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// ── FORGOT PASSWORD ───────────────────────────────────────────
+
+app.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const user = await User.findOne({ email });
+    // Always return success to prevent email enumeration
+    if (!user) return res.json({ message: "If that email exists, a reset link has been sent." });
+
+    // Generate a secure random token
+    const resetToken  = require("crypto").randomBytes(32).toString("hex");
+    const resetExpiry = new Date(Date.now() + 1000 * 60 * 30); // 30 minutes
+
+    user.resetToken       = resetToken;
+    user.resetTokenExpiry = resetExpiry;
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
+
+    await transporter.sendMail({
+      from: `"Wandr" <${process.env.EMAIL_USER}>`,
+      to:   email,
+      subject: "Reset your Wandr password",
+      html: `
+        <div style="font-family: 'DM Sans', Arial, sans-serif; background: #1a1510; padding: 40px; max-width: 520px; margin: 0 auto; border-radius: 16px;">
+          <div style="text-align:center; margin-bottom: 32px;">
+            <h1 style="font-family: Georgia, serif; color: #f5f0e8; font-size: 28px; margin: 0;">Wandr ✈️</h1>
+          </div>
+          <div style="background: rgba(245,240,232,0.05); border: 1px solid rgba(245,240,232,0.1); border-radius: 12px; padding: 28px;">
+            <h2 style="color: #f5f0e8; font-size: 20px; margin: 0 0 12px;">Reset your password</h2>
+            <p style="color: rgba(245,240,232,0.6); font-size: 14px; line-height: 1.6; margin: 0 0 24px;">
+              We received a request to reset your password. Click the button below to create a new one. This link expires in <strong style="color:#f5f0e8;">30 minutes</strong>.
+            </p>
+            <div style="text-align: center; margin-bottom: 24px;">
+              <a href="${resetUrl}"
+                style="display:inline-block; background: #c4622d; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px;">
+                Reset Password →
+              </a>
+            </div>
+            <p style="color: rgba(245,240,232,0.35); font-size: 12px; text-align:center; margin: 0;">
+              If you did not request this, you can safely ignore this email.
+            </p>
+          </div>
+        </div>
+      `
+    });
+
+    res.json({ message: "If that email exists, a reset link has been sent." });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Failed to send reset email" });
+  }
+});
+
+app.post("/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) return res.status(400).json({ message: "Token and password are required" });
+    if (password.length < 6)  return res.status(400).json({ message: "Password must be at least 6 characters" });
+
+    const user = await User.findOne({
+      resetToken:       token,
+      resetTokenExpiry: { $gt: new Date() } // token not expired
+    });
+
+    if (!user) return res.status(400).json({ message: "Reset link is invalid or has expired" });
+
+    user.password          = await bcrypt.hash(password, 10);
+    user.resetToken        = null;
+    user.resetTokenExpiry  = null;
+    await user.save();
+
+    res.json({ message: "Password reset successful. You can now log in." });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 app.get("/profile", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ name: user.name, email: user.email });
+    res.json({ name: user.name, email: user.email, avatar: user.avatar, bio: user.bio, location: user.location });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -79,15 +170,78 @@ app.get("/profile", authMiddleware, async (req, res) => {
 
 app.put("/profile", authMiddleware, async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, bio, location } = req.body;
     if (!name || !email) return res.status(400).json({ message: "Name and email are required" });
     const existing = await User.findOne({ email });
     if (existing && existing._id.toString() !== req.user.id) {
       return res.status(400).json({ message: "Email already in use" });
     }
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, { name, email }, { new: true }).select("-password");
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, email, bio: bio || "", location: location || "" },
+      { new: true }
+    ).select("-password");
     if (!updatedUser) return res.status(404).json({ message: "User not found" });
-    res.json({ message: "Profile updated", name: updatedUser.name, email: updatedUser.email });
+    res.json({ message: "Profile updated", name: updatedUser.name, email: updatedUser.email, avatar: updatedUser.avatar, bio: updatedUser.bio, location: updatedUser.location });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Upload avatar (base64)
+app.put("/profile/avatar", authMiddleware, async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    if (!avatar) return res.status(400).json({ message: "No image provided" });
+
+    // Limit size to ~2MB base64
+    if (avatar.length > 2.5 * 1024 * 1024)
+      return res.status(400).json({ message: "Image too large. Please use an image under 2MB." });
+
+    await User.findByIdAndUpdate(req.user.id, { avatar });
+    res.json({ message: "Avatar updated", avatar });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Travel stats
+app.get("/profile/stats", authMiddleware, async (req, res) => {
+  try {
+    const Bill = require("./models/Bill");
+
+    // Teams the user is part of
+    const teams = await Team.find({
+      $or: [{ owner: req.user.id }, { "members.user": req.user.id }]
+    }).populate("members.user", "name");
+
+    const totalTeams      = teams.length;
+    const totalMembers    = [...new Set(teams.flatMap(t => t.members.map(m => m.user._id.toString())))].length;
+    const vacations       = teams.filter(t => t.vacation && (t.vacation.active || t.vacation.destination));
+    const activeVacations = vacations.filter(t => t.vacation.active).length;
+    const totalTrips      = vacations.length;
+    const destinations    = [...new Set(vacations.map(t => t.vacation.destination).filter(Boolean))];
+
+    // Bills
+    const myBills       = await Bill.find({ paidBy: req.user.id });
+    const totalPaid     = myBills.reduce((s, b) => s + b.amount, 0);
+    const billsInvolved = await Bill.find({ members: req.user.id });
+    const totalSpent    = billsInvolved.reduce((s, b) => s + b.splitAmount, 0);
+
+    // Member since
+    const user        = await User.findById(req.user.id);
+    const memberSince = user.createdAt;
+
+    res.json({
+      totalTeams,
+      totalTrips,
+      activeVacations,
+      totalMembers,
+      totalPaid:    parseFloat(totalPaid.toFixed(2)),
+      totalSpent:   parseFloat(totalSpent.toFixed(2)),
+      destinations,
+      memberSince,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -119,8 +273,8 @@ app.post("/teams", authMiddleware, async (req, res) => {
 
     await team.save();
     const populated = await Team.findById(team._id)
-      .populate("owner", "name email")
-      .populate("members.user", "name email");
+      .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar");
 
     res.status(201).json({ message: "Team created", team: populated });
   } catch (error) {
@@ -137,8 +291,8 @@ app.get("/teams", authMiddleware, async (req, res) => {
         { "members.user": req.user.id }
       ]
     })
-      .populate("owner", "name email")
-      .populate("members.user", "name email");
+      .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar");
 
     res.json({ teams });
   } catch (error) {
@@ -169,8 +323,8 @@ app.post("/teams/join", authMiddleware, async (req, res) => {
     await team.save();
 
     const populated = await Team.findById(team._id)
-      .populate("owner", "name email")
-      .populate("members.user", "name email");
+      .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar");
 
     res.json({ message: `Joined team "${team.name}"!`, team: populated });
   } catch (error) {
@@ -228,8 +382,8 @@ app.get("/teams/invite/decline", async (req, res) => {
 app.get("/teams/:id", authMiddleware, async (req, res) => {
   try {
     const team = await Team.findById(req.params.id)
-      .populate("owner", "name email")
-      .populate("members.user", "name email");
+      .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar");
 
     if (!team) return res.status(404).json({ message: "Team not found" });
 
@@ -295,7 +449,7 @@ app.post("/teams/:id/invite", authMiddleware, async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email is required" });
 
-    const team = await Team.findById(req.params.id).populate("owner", "name email");
+    const team = await Team.findById(req.params.id).populate("owner", "name email avatar");
     if (!team) return res.status(404).json({ message: "Team not found" });
 
     const isMember = team.members.some(m => m.user.toString() === req.user.id);
@@ -407,13 +561,14 @@ app.post("/teams/:id/vacation/start", authMiddleware, async (req, res) => {
     if (team.vacation.active)
       return res.status(400).json({ message: "A vacation is already active" });
 
-    team.isLocked = true; // auto-lock when vacation starts
-    team.vacation = { active: true, destination, startedAt: new Date() };
+    team.isLocked = true;
+    const tripId = new mongoose.Types.ObjectId();
+    team.vacation = { active: true, destination, startedAt: new Date(), tripId };
     await team.save();
 
     const populated = await Team.findById(team._id)
-      .populate("owner", "name email")
-      .populate("members.user", "name email");
+      .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar");
     res.json({ message: `Vacation to ${destination} started!`, team: populated });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -430,13 +585,29 @@ app.post("/teams/:id/vacation/end", authMiddleware, async (req, res) => {
     if (!team.vacation.active)
       return res.status(400).json({ message: "No active vacation" });
 
-    team.vacation = { active: false, destination: "", startedAt: null };
+    // Save to pastVacations history
+    const tripId = team.vacation.tripId || new mongoose.Types.ObjectId();
+    team.pastVacations.push({
+      _id:         tripId,
+      destination: team.vacation.destination,
+      startedAt:   team.vacation.startedAt,
+      endedAt:     new Date(),
+      members:     team.members.map(m => m.user)
+    });
+
+    // Tag all untagged bills of this team with this tripId
+    await Bill.updateMany(
+      { team: team._id, tripId: null },
+      { $set: { tripId } }
+    );
+
+    team.vacation = { active: false, destination: "", startedAt: null, tripId: null };
     team.isLocked = false;
     await team.save();
 
     const populated = await Team.findById(team._id)
-      .populate("owner", "name email")
-      .populate("members.user", "name email");
+      .populate("owner", "name email avatar")
+      .populate("members.user", "name email avatar");
     res.json({ message: "Vacation ended!", team: populated });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -476,6 +647,483 @@ app.delete("/teams/:id", authMiddleware, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+// ── TRIPS ROUTES ──────────────────────────────────────────────
+
+// Get all past trips for the current user (across all teams)
+app.get("/trips", authMiddleware, async (req, res) => {
+  try {
+    const teams = await Team.find({
+      $or: [{ owner: req.user.id }, { "members.user": req.user.id }]
+    }).populate("pastVacations.members", "name email avatar");
+
+    const trips = [];
+    teams.forEach(team => {
+      // Active vacation counts too
+      if (team.vacation?.active) {
+        trips.push({
+          tripId:      team.vacation.tripId || team._id,
+          teamId:      team._id,
+          teamName:    team.name,
+          destination: team.vacation.destination,
+          startedAt:   team.vacation.startedAt,
+          endedAt:     null,
+          active:      true,
+          memberCount: team.members.length,
+        });
+      }
+      team.pastVacations.forEach(v => {
+        trips.push({
+          tripId:      v._id,
+          teamId:      team._id,
+          teamName:    team.name,
+          destination: v.destination,
+          startedAt:   v.startedAt,
+          endedAt:     v.endedAt,
+          active:      false,
+          memberCount: v.members.length,
+        });
+      });
+    });
+
+    // Sort newest first
+    trips.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+    res.json({ trips });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get a single trip detail — members + bills
+app.get("/trips/:tripId", authMiddleware, async (req, res) => {
+  try {
+    const { tripId } = req.params;
+
+    // Find the team that has this trip
+    const team = await Team.findOne({
+      $or: [
+        { "pastVacations._id": tripId },
+        { "vacation.tripId": tripId }
+      ]
+    })
+      .populate("members.user", "name email avatar")
+      .populate("pastVacations.members", "name email avatar");
+
+    if (!team) return res.status(404).json({ message: "Trip not found" });
+
+    const isMember = team.members.some(m => m.user._id.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not a team member" });
+
+    // Get trip snapshot
+    let trip;
+    if (team.vacation?.active && team.vacation.tripId?.toString() === tripId) {
+      trip = {
+        tripId,
+        teamId:      team._id,
+        teamName:    team.name,
+        destination: team.vacation.destination,
+        startedAt:   team.vacation.startedAt,
+        endedAt:     null,
+        active:      true,
+        members:     team.members.map(m => m.user),
+      };
+    } else {
+      const v = team.pastVacations.id(tripId);
+      if (!v) return res.status(404).json({ message: "Trip not found" });
+      trip = {
+        tripId,
+        teamId:      team._id,
+        teamName:    team.name,
+        destination: v.destination,
+        startedAt:   v.startedAt,
+        endedAt:     v.endedAt,
+        active:      false,
+        members:     v.members,
+      };
+    }
+
+    // Get bills for this trip
+    const bills = await Bill.find({ team: team._id, tripId })
+      .populate("paidBy",    "name email avatar")
+      .populate("members",   "name email avatar")
+      .populate("settledBy", "name email avatar")
+      .sort({ createdAt: -1 });
+
+    const totalSpent = bills.reduce((s, b) => s + b.amount, 0);
+
+    res.json({ trip, bills, totalSpent });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ── BILL ROUTES ───────────────────────────────────────────────
+const Bill = require("./models/Bill");
+
+// Add a bill to a team
+app.post("/teams/:id/bills", authMiddleware, async (req, res) => {
+  try {
+    const { title, amount, currency, paidBy, members, category, note } = req.body;
+    if (!title || !amount || !paidBy || !members?.length)
+      return res.status(400).json({ message: "title, amount, paidBy and members are required" });
+
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ message: "Team not found" });
+
+    const isMember = team.members.some(m => m.user.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not a team member" });
+
+    const splitAmount = parseFloat((amount / members.length).toFixed(2));
+
+    const bill = new Bill({
+      team: req.params.id,
+      title, amount, currency: currency || "INR",
+      paidBy, members, splitAmount,
+      category: category || "General",
+      note: note || "",
+      settledBy: [paidBy],
+      tripId: team.vacation?.active ? (team.vacation.tripId || null) : null
+    });
+
+    await bill.save();
+    const populated = await Bill.findById(bill._id)
+      .populate("paidBy", "name email avatar")
+      .populate("members", "name email avatar")
+      .populate("settledBy", "name email avatar");
+
+    res.status(201).json({ message: "Bill added", bill: populated });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get all bills for a team
+app.get("/teams/:id/bills", authMiddleware, async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ message: "Team not found" });
+
+    const isMember = team.members.some(m => m.user.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not a team member" });
+
+    const bills = await Bill.find({ team: req.params.id })
+      .populate("paidBy", "name email avatar")
+      .populate("members", "name email avatar")
+      .populate("settledBy", "name email avatar")
+      .sort({ createdAt: -1 });
+
+    // Calculate who owes what to whom
+    const balances = {};
+    const memberMap = {};
+
+    bills.forEach(bill => {
+      bill.members.forEach(m => { memberMap[m._id] = m.name; });
+      memberMap[bill.paidBy._id] = bill.paidBy.name;
+
+      bill.members.forEach(member => {
+        const memberId = member._id.toString();
+        const payerId  = bill.paidBy._id.toString();
+        if (memberId === payerId) return;
+
+        const alreadySettled = bill.settledBy.some(s => s._id.toString() === memberId);
+        if (alreadySettled) return;
+
+        const key = `${memberId}_${payerId}`;
+        balances[key] = (balances[key] || 0) + bill.splitAmount;
+      });
+    });
+
+    // Simplify: net balances
+    const settlements = Object.entries(balances).map(([key, amount]) => {
+      const [from, to] = key.split("_");
+      return { from, fromName: memberMap[from], to, toName: memberMap[to], amount: parseFloat(amount.toFixed(2)) };
+    }).filter(s => s.amount > 0);
+
+    res.json({ bills, settlements });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Mark yourself as settled on a bill
+app.post("/bills/:billId/settle", authMiddleware, async (req, res) => {
+  try {
+    const bill = await Bill.findById(req.params.billId);
+    if (!bill) return res.status(404).json({ message: "Bill not found" });
+
+    const alreadySettled = bill.settledBy.some(s => s.toString() === req.user.id);
+    if (alreadySettled) return res.status(400).json({ message: "Already marked as settled" });
+
+    bill.settledBy.push(req.user.id);
+    await bill.save();
+
+    const populated = await Bill.findById(bill._id)
+      .populate("paidBy", "name email avatar")
+      .populate("members", "name email avatar")
+      .populate("settledBy", "name email avatar");
+
+    res.json({ message: "Marked as settled", bill: populated });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Delete a bill (only payer or team owner)
+app.delete("/bills/:billId", authMiddleware, async (req, res) => {
+  try {
+    const bill = await Bill.findById(req.params.billId).populate("team");
+    if (!bill) return res.status(404).json({ message: "Bill not found" });
+
+    const isPayer = bill.paidBy.toString() === req.user.id;
+    const isOwner = bill.team.owner.toString() === req.user.id;
+    if (!isPayer && !isOwner)
+      return res.status(403).json({ message: "Only the payer or team owner can delete this bill" });
+
+    await Bill.findByIdAndDelete(req.params.billId);
+    res.json({ message: "Bill deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ── HOTEL ROUTES ──────────────────────────────────────────────
+const Hotel = require("./models/Hotel");
+
+// Add a hotel booking to a team
+app.post("/teams/:id/hotels", authMiddleware, async (req, res) => {
+  try {
+    const { name, address, checkIn, checkOut, pricePerNight, currency, rooms, notes, bookedMembers } = req.body;
+    if (!name || !checkIn || !checkOut || !pricePerNight)
+      return res.status(400).json({ message: "name, checkIn, checkOut and pricePerNight are required" });
+
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ message: "Team not found" });
+
+    const isMember = team.members.some(m => m.user.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not a team member" });
+
+    const nights     = Math.max(1, Math.round((new Date(checkOut) - new Date(checkIn)) / (1000*60*60*24)));
+    const totalPrice = parseFloat((pricePerNight * (rooms || 1) * nights).toFixed(2));
+
+    const hotel = new Hotel({
+      team:        req.params.id,
+      tripId:      team.vacation?.active ? (team.vacation.tripId || null) : null,
+      addedBy:     req.user.id,
+      name, address: address || "",
+      destination: team.vacation?.destination || "",
+      checkIn, checkOut,
+      pricePerNight, currency: currency || "INR",
+      rooms: rooms || 1,
+      totalPrice, notes: notes || "",
+      bookedMembers: bookedMembers || team.members.map(m => m.user),
+    });
+
+    await hotel.save();
+    const populated = await Hotel.findById(hotel._id)
+      .populate("addedBy", "name email avatar")
+      .populate("bookedMembers", "name email avatar");
+
+    res.status(201).json({ message: "Hotel booking added", hotel: populated });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Get all hotels for a team
+app.get("/teams/:id/hotels", authMiddleware, async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ message: "Team not found" });
+
+    const isMember = team.members.some(m => m.user.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not a team member" });
+
+    const hotels = await Hotel.find({ team: req.params.id })
+      .populate("addedBy", "name email avatar")
+      .populate("bookedMembers", "name email avatar")
+      .sort({ checkIn: 1 });
+
+    res.json({ hotels });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Update hotel status
+app.patch("/hotels/:hotelId/status", authMiddleware, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!["planned", "confirmed", "cancelled"].includes(status))
+      return res.status(400).json({ message: "Invalid status" });
+
+    const hotel = await Hotel.findById(req.params.hotelId).populate("team");
+    if (!hotel) return res.status(404).json({ message: "Hotel not found" });
+
+    const isMember = hotel.team.members.some(m => m.user.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not authorized" });
+
+    hotel.status = status;
+    await hotel.save();
+    res.json({ message: "Status updated", hotel });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Delete a hotel booking
+app.delete("/hotels/:hotelId", authMiddleware, async (req, res) => {
+  try {
+    const hotel = await Hotel.findById(req.params.hotelId).populate("team");
+    if (!hotel) return res.status(404).json({ message: "Hotel not found" });
+
+    const isAdder = hotel.addedBy.toString() === req.user.id;
+    const isOwner = hotel.team.owner.toString() === req.user.id;
+    if (!isAdder && !isOwner)
+      return res.status(403).json({ message: "Only the person who added it or the team owner can delete" });
+
+    await Hotel.findByIdAndDelete(req.params.hotelId);
+    res.json({ message: "Hotel booking deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ── PLACES / EXPLORE ROUTES ───────────────────────────────────
+
+// Search hotels / restaurants / attractions via Google Places
+app.get("/explore/search", authMiddleware, async (req, res) => {
+  try {
+    const { destination, type } = req.query;
+    if (!destination) return res.status(400).json({ message: "destination is required" });
+
+    const PLACES_KEY = process.env.GOOGLE_PLACES_KEY;
+    if (!PLACES_KEY) return res.status(500).json({ message: "Google Places API key not configured" });
+
+    // type: hotel | restaurant | tourist_attraction
+    const query      = encodeURIComponent(`${type || "hotel"} in ${destination}`);
+    const searchUrl  = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${PLACES_KEY}`;
+
+    const response = await fetch(searchUrl);
+    const data     = await response.json();
+
+    if (data.status !== "OK" && data.status !== "ZERO_RESULTS")
+      return res.status(500).json({ message: `Places API error: ${data.status}` });
+
+    const places = (data.results || []).slice(0, 15).map(p => ({
+      id:           p.place_id,
+      name:         p.name,
+      address:      p.formatted_address,
+      rating:       p.rating,
+      totalRatings: p.user_ratings_total,
+      priceLevel:   p.price_level, // 0-4
+      types:        p.types,
+      location:     p.geometry?.location,
+      photo:        p.photos?.[0]?.photo_reference
+        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${p.photos[0].photo_reference}&key=${PLACES_KEY}`
+        : null,
+      mapsUrl: `https://www.google.com/maps/place/?q=place_id:${p.place_id}`,
+      open:    p.opening_hours?.open_now,
+    }));
+
+    res.json({ places, destination });
+  } catch (error) {
+    console.error("Places error:", error);
+    res.status(500).json({ message: "Failed to fetch places" });
+  }
+});
+
+// ── CHAT ROUTES ───────────────────────────────────────────────
+
+// Get message history for a team
+app.get("/teams/:id/messages", authMiddleware, async (req, res) => {
+  try {
+    const team = await Team.findById(req.params.id);
+    if (!team) return res.status(404).json({ message: "Team not found" });
+    const isMember = team.members.some(m => m.user.toString() === req.user.id);
+    if (!isMember) return res.status(403).json({ message: "Not a team member" });
+
+    const messages = await Message.find({ team: req.params.id })
+      .populate("sender", "name email avatar")
+      .sort({ createdAt: 1 })
+      .limit(100);
+
+    res.json({ messages });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ── SOCKET.IO ─────────────────────────────────────────────────
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) return next(new Error("No token"));
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.id;
+    socket.userEmail = decoded.email;
+    next();
+  } catch { next(new Error("Invalid token")); }
+});
+
+io.on("connection", (socket) => {
+  // Join a team room
+  socket.on("join_team", (teamId) => {
+    socket.join(teamId);
+  });
+
+  // Handle sending a message
+  socket.on("send_message", async ({ teamId, content }) => {
+    try {
+      if (!content?.trim()) return;
+
+      const user = await User.findById(socket.userId).select("name email avatar");
+      const msg  = await Message.create({ team: teamId, sender: socket.userId, content: content.trim() });
+
+      const populated = await Message.findById(msg._id).populate("sender", "name email avatar");
+      io.to(teamId).emit("new_message", populated);
+
+      // Check if message is asking AI (starts with @ai or @bot)
+      const isAIQuery = content.trim().toLowerCase().startsWith("@ai") || content.trim().toLowerCase().startsWith("@bot");
+      if (isAIQuery && process.env.GROQ_API_KEY) {
+        const team = await Team.findById(teamId);
+        const question = content.replace(/@ai|@bot/gi, "").trim();
+
+        try {
+          const completion = await groq.chat.completions.create({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              {
+                role: "system",
+                content: `You are a helpful travel assistant for a group trip to ${team?.vacation?.destination || "their destination"}. 
+                Help with hotel recommendations, restaurant suggestions, itinerary planning, local tips, and budget advice. 
+                Keep responses concise and friendly. Use emojis occasionally.`
+              },
+              { role: "user", content: question }
+            ],
+            max_tokens: 400,
+          });
+
+          const aiReply = completion?.choices?.[0]?.message?.content;
+          if (!aiReply) throw new Error("Empty response from Groq: " + JSON.stringify(completion));
+
+          const aiMsg      = await Message.create({ team: teamId, sender: null, content: aiReply, isAI: true });
+          const aiPopulated = await Message.findById(aiMsg._id);
+          io.to(teamId).emit("new_message", aiPopulated);
+        } catch (aiErr) {
+          console.error("Groq full error:", JSON.stringify(aiErr, null, 2));
+          console.error("Groq error message:", aiErr?.message);
+          console.error("Groq error status:", aiErr?.status);
+          const errMsg = await Message.create({ team: teamId, sender: null, content: `AI error: ${aiErr?.message || aiErr?.error?.message || "Unknown error"}`, isAI: true });
+          io.to(teamId).emit("new_message", errMsg);
+        }
+      }
+    } catch (err) {
+      console.error("Socket message error:", err);
+    }
+  });
+
+  socket.on("disconnect", () => {});
+});
+
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

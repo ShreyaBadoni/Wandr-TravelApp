@@ -1,0 +1,252 @@
+/* ============================
+   WANDR — PROFILE PAGE STYLES
+   ============================ */
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Sidebar ── */
+.profile-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Avatar card */
+.profile-avatar-card {
+  text-align: center;
+  padding: 36px 28px !important;
+}
+
+.profile-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.profile-avatar-ring {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c4622d, #d4a853);
+  padding: 3px;
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-initials {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #1a1510;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Playfair Display", serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #f5f0e8;
+}
+
+.profile-avatar-uploading {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(26,21,16,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar-edit-btn {
+  background: rgba(245,240,232,0.06);
+  border: 1px solid rgba(245,240,232,0.15);
+  color: rgba(245,240,232,0.6);
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profile-avatar-edit-btn:hover:not(:disabled) {
+  border-color: rgba(196,98,45,0.4);
+  color: #c4622d;
+  background: rgba(196,98,45,0.08);
+}
+
+.profile-avatar-edit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile-avatar-name {
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-bottom: 4px;
+}
+
+.profile-avatar-email {
+  font-size: 13px;
+  color: rgba(245,240,232,0.45);
+  margin-bottom: 8px;
+}
+
+.profile-avatar-location {
+  font-size: 13px;
+  color: rgba(245,240,232,0.5);
+  margin-bottom: 8px;
+}
+
+.profile-member-since {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.25);
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(245,240,232,0.07);
+}
+
+/* Stats card */
+.profile-stats-card {
+  padding: 28px !important;
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.profile-stat {
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.profile-stat:hover {
+  border-color: rgba(196,98,45,0.25);
+}
+
+.ps-icon { font-size: 20px; margin-bottom: 6px; }
+
+.ps-value {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #d4a853;
+  margin-bottom: 2px;
+}
+
+.ps-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.35);
+}
+
+/* Money stats */
+.profile-money-stats {
+  border-top: 1px solid rgba(245,240,232,0.08);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.pms-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pms-label {
+  font-size: 13px;
+  color: rgba(245,240,232,0.45);
+}
+
+.pms-value {
+  font-family: "Playfair Display", serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f5f0e8;
+}
+
+.pms-value.gold { color: #d4a853; }
+
+/* Destinations */
+.profile-destinations {
+  border-top: 1px solid rgba(245,240,232,0.08);
+  padding-top: 16px;
+}
+
+.dest-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dest-tag-pill {
+  background: rgba(196,98,45,0.1);
+  border: 1px solid rgba(196,98,45,0.25);
+  color: rgba(245,240,232,0.7);
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 100px;
+}
+
+/* ── Main column ── */
+.profile-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Vacation banner */
+.profile-vacation-banner {
+  background: linear-gradient(135deg, rgba(196,98,45,0.12), rgba(212,168,83,0.08)) !important;
+  border: 1px solid rgba(196,98,45,0.25) !important;
+  padding: 28px 32px !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-sidebar {
+    grid-template-columns: 1fr;
+  }
+}

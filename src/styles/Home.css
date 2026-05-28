@@ -643,3 +643,32 @@
   .hero-stats { gap: 20px; }
   .stat-num { font-size: 22px; }
 }
+
+
+/* ── Home polish ── */
+.dest-card {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.dest-card:hover {
+  box-shadow: 0 24px 56px rgba(26,21,16,0.18);
+}
+
+.feature-card {
+  backdrop-filter: blur(4px);
+}
+
+.cta-btn.primary {
+  box-shadow: 0 4px 20px rgba(196,98,45,0.25);
+}
+
+.cta-btn.primary:hover {
+  box-shadow: 0 10px 36px rgba(196,98,45,0.45);
+}
+
+.hero-title em {
+  background: linear-gradient(135deg, #c4622d, #e07a40);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

@@ -1,0 +1,231 @@
+/* ============================
+   WANDR — HOTELS PAGE STYLES
+   ============================ */
+
+.hotels-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.hotel-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+/* Hotel cards */
+.hotels-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hotel-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  background: rgba(245,240,232,0.03);
+  border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  animation: wFadeUp 0.5s calc(var(--i,0)*0.06s) ease both;
+}
+
+.hotel-card:hover {
+  border-color: rgba(196,98,45,0.3);
+  background: rgba(196,98,45,0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.hotel-card-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.hotel-icon { font-size: 32px; flex-shrink: 0; }
+
+.hotel-info { flex: 1; min-width: 0; }
+
+.hotel-name {
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5f0e8;
+  margin-bottom: 4px;
+}
+
+.hotel-address {
+  font-size: 12px;
+  color: rgba(245,240,232,0.4);
+  margin-bottom: 6px;
+}
+
+.hotel-dates {
+  font-size: 13px;
+  color: rgba(245,240,232,0.55);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.hotel-nights-pill {
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(245,240,232,0.06);
+  border: 1px solid rgba(245,240,232,0.12);
+  color: rgba(245,240,232,0.5);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.hotel-members-row {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.hotel-card-right {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.hotel-total {
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #f5f0e8;
+}
+
+.hotel-per-night {
+  font-size: 11px;
+  color: rgba(245,240,232,0.35);
+}
+
+.hotel-status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
+.hotel-status-badge.large {
+  font-size: 13px;
+  padding: 8px 18px;
+}
+
+/* Add modal */
+.hotels-modal { max-width: 520px; }
+
+.hotel-date-row,
+.hotel-price-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.hotel-date-row .flex-1,
+.hotel-price-row .flex-1 { flex: 1; }
+
+.hotel-price-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(122,158,126,0.08);
+  border: 1px solid rgba(122,158,126,0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: rgba(245,240,232,0.55);
+  margin-bottom: 4px;
+}
+
+.hotel-price-preview strong {
+  color: #7a9e7e;
+  font-family: "Playfair Display", serif;
+  font-size: 18px;
+}
+
+/* Detail modal */
+.hotel-detail-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+
+.hds-block { flex: 1; }
+.hds-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,240,232,0.35); margin-bottom: 4px; }
+.hds-value { font-size: 15px; font-weight: 500; color: #f5f0e8; }
+.hds-divider { color: rgba(245,240,232,0.2); font-size: 20px; }
+.hds-nights { text-align: right; }
+
+.hotel-detail-price {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.hotel-detail-total {
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #d4a853;
+  margin: 4px 0;
+}
+
+/* Status buttons */
+.hotel-status-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.hotel-status-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid rgba(245,240,232,0.15);
+  background: rgba(245,240,232,0.04);
+  color: rgba(245,240,232,0.5);
+  transition: all 0.2s;
+}
+
+.hotel-status-btn:hover:not(.active) {
+  border-color: rgba(245,240,232,0.3);
+  color: #f5f0e8;
+}
+
+@media (max-width: 640px) {
+  .hotel-card { flex-direction: column; align-items: flex-start; }
+  .hotel-card-right { text-align: left; align-items: flex-start; }
+  .hotel-date-row, .hotel-price-row { flex-wrap: wrap; }
+}

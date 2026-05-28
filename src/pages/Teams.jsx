@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import UserAvatar from "../components/UserAvatar";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "../styles/dashboard.css";
@@ -370,7 +371,7 @@ function Teams({ toggleTheme }) {
                   <div className="members-list">
                     {selectedTeam.members.map(m => (
                       <div className="member-row" key={m.user._id}>
-                        <div className="member-avatar">{m.user.name?.slice(0, 2).toUpperCase() || "?"}</div>
+                        <UserAvatar user={m.user} size={36} />
                         <div className="member-info">
                           <div className="member-name">{m.user.name}</div>
                           <div className="member-email">{m.user.email}</div>
