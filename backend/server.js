@@ -55,14 +55,38 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("mongodb connected"))
   .catch(err => console.log(err));
 
+// ── Environment variable validation ───────────────────────────
+// EMAIL_FROM should be a verified sender in Brevo (not a Gmail address).
+// Gmail/Yahoo/Microsoft reject transactional emails from free Gmail addresses
+// sent via third-party SMTP providers due to DMARC/SPF policies.
+// Use a custom domain or Brevo's provided sender for best deliverability.
+if (!process.env.BREVO_USER) console.warn("⚠️  WARNING: BREVO_USER is not set");
+if (!process.env.BREVO_PASS) console.warn("⚠️  WARNING: BREVO_PASS is not set");
+if (!process.env.EMAIL_FROM) console.warn("⚠️  WARNING: EMAIL_FROM is not set — falling back to BREVO_USER");
+
 // ── Email transporter ──────────────────────────────────────────
+// Using Brevo (smtp-relay.brevo.com) on port 587 with TLS.
+// BREVO_USER and BREVO_PASS must be set in environment variables.
+// EMAIL_FROM should be a verified sender address in Brevo dashboard.
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
   secure: false,
   auth: {
     user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS
+    pass: process.env.BREVO_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+
+// Verify SMTP connection on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("SMTP ERROR:", error);
+  } else {
+    console.log("SMTP READY ✅");
   }
 });
 
@@ -70,6 +94,22 @@ const transporter = nodemailer.createTransport({
 function generateCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
+
+// ── TEST MAIL ROUTE (temporary — for debugging only) ──────────
+app.get("/test-mail", async (req, res) => {
+  try {
+    await transporter.sendMail({
+      from: `"Wandr" <${process.env.EMAIL_FROM || process.env.BREVO_USER}>`,
+      to: process.env.EMAIL_FROM || process.env.BREVO_USER,
+      subject: "Wandr Test Email",
+      html: "<h1>Email system working ✅</h1><p>Brevo SMTP is configured correctly.</p>"
+    });
+    res.json({ success: true, message: "Test email sent successfully" });
+  } catch (err) {
+    console.error("MAIL ERROR:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // ── AUTH ROUTES ───────────────────────────────────────────────
 
@@ -126,10 +166,11 @@ app.post("/forgot-password", async (req, res) => {
 
     const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
 
-    await transporter.sendMail({
-      from: `"Wandr" <shreyabadoni01@gmail.com>`,
-      to:   email,
-      subject: "Reset your Wandr password",
+    try {
+      await transporter.sendMail({
+        from: `"Wandr" <${process.env.EMAIL_FROM || process.env.BREVO_USER}>`,
+        to:   email,
+        subject: "Reset your Wandr password",
       html: `
         <div style="font-family: 'DM Sans', Arial, sans-serif; background: #1a1510; padding: 40px; max-width: 520px; margin: 0 auto; border-radius: 16px;">
           <div style="text-align:center; margin-bottom: 32px;">
@@ -152,7 +193,12 @@ app.post("/forgot-password", async (req, res) => {
           </div>
         </div>
       `
-    });
+      });
+      console.log("Password reset email sent to:", email);
+    } catch (mailErr) {
+      console.error("MAIL ERROR (forgot-password):", mailErr.message);
+      // Don't fail the request — token is saved, user can retry
+    }
 
     res.json({ message: "If that email exists, a reset link has been sent." });
   } catch (error) {
@@ -509,7 +555,7 @@ app.post("/teams/:id/invite", authMiddleware, async (req, res) => {
     const inviterUser = await User.findById(req.user.id).select("name email");
 
     const mailOptions = {
-      from: `"Wandr" <shreyabadoni01@gmail.com>`,
+      from: `"Wandr" <${process.env.EMAIL_FROM || process.env.BREVO_USER}>`,
       to: email,
       subject: `${inviterUser.name} invited you to join "${team.name}" on Wandr ✦`,
       html: `
