@@ -15,7 +15,7 @@ function ForgotPassword() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("http://localhost:5001/forgot-password", { email });
+      await axios.post("https://wandr-travelapp.onrender.com/forgot-password", { email });
       setSent(true);
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong. Try again.");

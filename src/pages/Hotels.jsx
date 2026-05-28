@@ -40,7 +40,7 @@ function Hotels({ toggleTheme }) {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/teams", { headers: { Authorization: token } });
+        const res = await axios.get("https://wandr-travelapp.onrender.com/teams", { headers: { Authorization: token } });
         const activeTeams = res.data.teams.filter(t => t.vacation?.active);
         setTeams(activeTeams);
         if (activeTeams.length > 0) setSelectedTeam(activeTeams[0]);
@@ -57,7 +57,7 @@ function Hotels({ toggleTheme }) {
   const fetchHotels = async (teamId) => {
     setHotelsLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5001/teams/${teamId}/hotels`, { headers: { Authorization: token } });
+      const res = await axios.get(`https://wandr-travelapp.onrender.com/teams/${teamId}/hotels`, { headers: { Authorization: token } });
       setHotels(res.data.hotels);
     } catch { toast.error("Failed to load hotels"); }
     finally { setHotelsLoading(false); }
@@ -95,7 +95,7 @@ function Hotels({ toggleTheme }) {
 
     try {
       setSubmitting(true);
-      await axios.post(`http://localhost:5001/teams/${selectedTeam._id}/hotels`,
+      await axios.post(`https://wandr-travelapp.onrender.com/teams/${selectedTeam._id}/hotels`,
         { ...form, pricePerNight: +form.pricePerNight, rooms: +form.rooms, bookedMembers },
         { headers: { Authorization: token } }
       );
@@ -108,7 +108,7 @@ function Hotels({ toggleTheme }) {
 
   const updateStatus = async (hotelId, status) => {
     try {
-      await axios.patch(`http://localhost:5001/hotels/${hotelId}/status`, { status }, { headers: { Authorization: token } });
+      await axios.patch(`https://wandr-travelapp.onrender.com/hotels/${hotelId}/status`, { status }, { headers: { Authorization: token } });
       toast.success(`Marked as ${status}`);
       fetchHotels(selectedTeam._id);
       if (selectedHotel?._id === hotelId) setSelectedHotel(h => ({ ...h, status }));
@@ -118,7 +118,7 @@ function Hotels({ toggleTheme }) {
   const deleteHotel = async (hotelId) => {
     if (!window.confirm("Delete this hotel booking?")) return;
     try {
-      await axios.delete(`http://localhost:5001/hotels/${hotelId}`, { headers: { Authorization: token } });
+      await axios.delete(`https://wandr-travelapp.onrender.com/hotels/${hotelId}`, { headers: { Authorization: token } });
       toast.success("Booking deleted");
       setModal(null);
       fetchHotels(selectedTeam._id);

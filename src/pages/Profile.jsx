@@ -26,8 +26,8 @@ function Profile({ toggleTheme }) {
     const fetchAll = async () => {
       try {
         const [profileRes, statsRes] = await Promise.all([
-          axios.get("http://localhost:5001/profile",       { headers: { Authorization: token } }),
-          axios.get("http://localhost:5001/profile/stats", { headers: { Authorization: token } }),
+          axios.get("https://wandr-travelapp.onrender.com/profile",       { headers: { Authorization: token } }),
+          axios.get("https://wandr-travelapp.onrender.com/profile/stats", { headers: { Authorization: token } }),
         ]);
         const p = profileRes.data;
         setName(p.name); setEmail(p.email);
@@ -53,7 +53,7 @@ function Profile({ toggleTheme }) {
       const base64 = reader.result;
       setUploading(true);
       try {
-        await axios.put("http://localhost:5001/profile/avatar",
+        await axios.put("https://wandr-travelapp.onrender.com/profile/avatar",
           { avatar: base64 },
           { headers: { Authorization: token } }
         );
@@ -71,7 +71,7 @@ function Profile({ toggleTheme }) {
     if (!name || !email) { toast.error("Name and email are required"); return; }
     try {
       setLoading(true);
-      await axios.put("http://localhost:5001/profile",
+      await axios.put("https://wandr-travelapp.onrender.com/profile",
         { name, email, bio, location },
         { headers: { Authorization: token } }
       );

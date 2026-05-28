@@ -41,7 +41,7 @@ function Bills({ toggleTheme }) {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/teams", { headers: { Authorization: token } });
+        const res = await axios.get("https://wandr-travelapp.onrender.com/teams", { headers: { Authorization: token } });
         setTeams(res.data.teams);
         if (res.data.teams.length > 0) {
           const active = res.data.teams.find(t => t.vacation?.active) || res.data.teams[0];
@@ -60,7 +60,7 @@ function Bills({ toggleTheme }) {
   const fetchBills = async (teamId) => {
     setBillsLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5001/teams/${teamId}/bills`, { headers: { Authorization: token } });
+      const res = await axios.get(`https://wandr-travelapp.onrender.com/teams/${teamId}/bills`, { headers: { Authorization: token } });
       setBills(res.data.bills);
       setSettlements(res.data.settlements);
     } catch { toast.error("Failed to load bills"); }
@@ -90,7 +90,7 @@ function Bills({ toggleTheme }) {
 
     try {
       setSubmitting(true);
-      await axios.post(`http://localhost:5001/teams/${selectedTeam._id}/bills`,
+      await axios.post(`https://wandr-travelapp.onrender.com/teams/${selectedTeam._id}/bills`,
         { title, amount: +amount, currency, paidBy, members: splitWith, category, note },
         { headers: { Authorization: token } }
       );
@@ -103,7 +103,7 @@ function Bills({ toggleTheme }) {
 
   const settleBill = async (billId) => {
     try {
-      await axios.post(`http://localhost:5001/bills/${billId}/settle`, {}, { headers: { Authorization: token } });
+      await axios.post(`https://wandr-travelapp.onrender.com/bills/${billId}/settle`, {}, { headers: { Authorization: token } });
       toast.success("Marked as settled!");
       fetchBills(selectedTeam._id);
     } catch (err) { toast.error(err.response?.data?.message || "Failed"); }
@@ -112,7 +112,7 @@ function Bills({ toggleTheme }) {
   const deleteBill = async (billId) => {
     if (!window.confirm("Delete this bill?")) return;
     try {
-      await axios.delete(`http://localhost:5001/bills/${billId}`, { headers: { Authorization: token } });
+      await axios.delete(`https://wandr-travelapp.onrender.com/bills/${billId}`, { headers: { Authorization: token } });
       toast.success("Bill deleted");
       setModal(null);
       fetchBills(selectedTeam._id);

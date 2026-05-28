@@ -23,7 +23,7 @@ function Trips({ toggleTheme }) {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/trips", { headers: { Authorization: token } });
+        const res = await axios.get("https://wandr-travelapp.onrender.com/trips", { headers: { Authorization: token } });
         setTrips(res.data.trips);
       } catch { toast.error("Failed to load trips"); }
       finally { setLoading(false); }
@@ -36,7 +36,7 @@ function Trips({ toggleTheme }) {
     setDetailLoading(true);
     setTripDetail(null);
     try {
-      const res = await axios.get(`http://localhost:5001/trips/${trip.tripId}`, { headers: { Authorization: token } });
+      const res = await axios.get(`https://wandr-travelapp.onrender.com/trips/${trip.tripId}`, { headers: { Authorization: token } });
       setTripDetail(res.data);
     } catch { toast.error("Failed to load trip details"); }
     finally { setDetailLoading(false); }

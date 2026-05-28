@@ -17,8 +17,8 @@ function Dashboard({ toggleTheme }) {
     const fetchAll = async () => {
       try {
         const [profileRes, teamsRes] = await Promise.all([
-          axios.get("http://localhost:5001/profile", { headers: { Authorization: token } }),
-          axios.get("http://localhost:5001/teams",   { headers: { Authorization: token } }),
+          axios.get("https://wandr-travelapp.onrender.com/profile", { headers: { Authorization: token } }),
+          axios.get("https://wandr-travelapp.onrender.com/teams",   { headers: { Authorization: token } }),
         ]);
         setName(profileRes.data.name);
         localStorage.setItem("userName", profileRes.data.name);

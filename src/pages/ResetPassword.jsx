@@ -23,7 +23,7 @@ function ResetPassword() {
     setError("");
     setLoading(true);
     try {
-      await axios.post("http://localhost:5001/reset-password", { token, password });
+      await axios.post("https://wandr-travelapp.onrender.com/reset-password", { token, password });
       setDone(true);
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {

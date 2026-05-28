@@ -28,7 +28,7 @@ function Teams({ toggleTheme }) {
 
   const fetchTeams = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/teams", { headers: { Authorization: token } });
+      const res = await axios.get("https://wandr-travelapp.onrender.com/teams", { headers: { Authorization: token } });
       setTeams(res.data.teams);
     } catch { toast.error("Failed to load teams"); }
     finally { setLoading(false); }
@@ -52,7 +52,7 @@ function Teams({ toggleTheme }) {
     if (!newTeamName.trim()) { toast.error("Team name is required"); return; }
     try {
       setSubmitting(true);
-      const res = await axios.post("http://localhost:5001/teams",
+      const res = await axios.post("https://wandr-travelapp.onrender.com/teams",
         { name: newTeamName, description: newTeamDesc },
         { headers: { Authorization: token } }
       );
@@ -66,7 +66,7 @@ function Teams({ toggleTheme }) {
     if (!joinCode.trim()) { toast.error("Enter a team code"); return; }
     try {
       setSubmitting(true);
-      const res = await axios.post("http://localhost:5001/teams/join",
+      const res = await axios.post("https://wandr-travelapp.onrender.com/teams/join",
         { code: joinCode },
         { headers: { Authorization: token } }
       );
@@ -81,7 +81,7 @@ function Teams({ toggleTheme }) {
     try {
       setSubmitting(true);
       const res = await axios.post(
-        `http://localhost:5001/teams/${selectedTeam._id}/invite`,
+        `https://wandr-travelapp.onrender.com/teams/${selectedTeam._id}/invite`,
         { email: inviteEmail },
         { headers: { Authorization: token } }
       );
@@ -93,7 +93,7 @@ function Teams({ toggleTheme }) {
 
   const toggleLock = async (team) => {
     try {
-      const res = await axios.post(`http://localhost:5001/teams/${team._id}/lock`, {},
+      const res = await axios.post(`https://wandr-travelapp.onrender.com/teams/${team._id}/lock`, {},
         { headers: { Authorization: token } }
       );
       toast.success(res.data.message);
@@ -108,7 +108,7 @@ function Teams({ toggleTheme }) {
     try {
       setSubmitting(true);
       const res = await axios.post(
-        `http://localhost:5001/teams/${selectedTeam._id}/vacation/start`,
+        `https://wandr-travelapp.onrender.com/teams/${selectedTeam._id}/vacation/start`,
         { destination },
         { headers: { Authorization: token } }
       );
@@ -120,7 +120,7 @@ function Teams({ toggleTheme }) {
 
   const endVacation = async (team) => {
     try {
-      await axios.post(`http://localhost:5001/teams/${team._id}/vacation/end`, {},
+      await axios.post(`https://wandr-travelapp.onrender.com/teams/${team._id}/vacation/end`, {},
         { headers: { Authorization: token } }
       );
       toast.success("Vacation ended!");
@@ -130,7 +130,7 @@ function Teams({ toggleTheme }) {
 
   const leaveTeam = async (team) => {
     try {
-      await axios.post(`http://localhost:5001/teams/${team._id}/leave`, {},
+      await axios.post(`https://wandr-travelapp.onrender.com/teams/${team._id}/leave`, {},
         { headers: { Authorization: token } }
       );
       toast.success(`Left "${team.name}"`);
@@ -140,7 +140,7 @@ function Teams({ toggleTheme }) {
 
   const deleteTeam = async (team) => {
     try {
-      await axios.delete(`http://localhost:5001/teams/${team._id}`,
+      await axios.delete(`https://wandr-travelapp.onrender.com/teams/${team._id}`,
         { headers: { Authorization: token } }
       );
       toast.success(`Deleted "${team.name}"`);

@@ -31,7 +31,7 @@ function Explore({ toggleTheme }) {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/teams", { headers: { Authorization: token } });
+        const res = await axios.get("https://wandr-travelapp.onrender.com/teams", { headers: { Authorization: token } });
         const active = res.data.teams.filter(t => t.vacation?.active);
         setTeams(active);
         if (active.length > 0) setSelectedTeam(active[0]);
@@ -50,7 +50,7 @@ function Explore({ toggleTheme }) {
     setLoading(true);
     setSearched(true);
     try {
-      const res = await axios.get("http://localhost:5001/explore/search", {
+      const res = await axios.get("https://wandr-travelapp.onrender.com/explore/search", {
         headers: { Authorization: token },
         params:  { destination, type: searchType }
       });

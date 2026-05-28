@@ -47,7 +47,7 @@
 //       return;
 //     }try{
 //     setLoading(true);
-//     await axios.post("http://localhost:5001/signup", {
+//     await axios.post("https://wandr-travelapp.onrender.com/signup", {
 //         name,
 //         email,
 //         password
@@ -167,7 +167,7 @@ function Signup() {
     }
     try {
       setLoading(true);
-      await axios.post("http://localhost:5001/signup", { name, email, password });
+      await axios.post("https://wandr-travelapp.onrender.com/signup", { name, email, password });
       toast.success("Account created!");
       navigate("/login");
     } catch (error) {

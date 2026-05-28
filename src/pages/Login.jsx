@@ -17,7 +17,7 @@ function Login() {
     }
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5001/login", { email, password });
+      const res = await axios.post("https://wandr-travelapp.onrender.com/login", { email, password });
       localStorage.setItem("token", res.data.token);
       toast.success("Welcome back!");
       navigate("/dashboard");

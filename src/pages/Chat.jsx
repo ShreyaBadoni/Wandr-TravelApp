@@ -35,7 +35,7 @@ function Chat({ toggleTheme }) {
 
   // Init socket
   useEffect(() => {
-    socket = io("http://localhost:5001", { auth: { token } });
+    socket = io("https://wandr-travelapp.onrender.com", { auth: { token } });
     socket.on("connect_error", () => toast.error("Chat connection failed"));
     return () => socket.disconnect();
   }, []);
@@ -44,7 +44,7 @@ function Chat({ toggleTheme }) {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const res = await axios.get("http://localhost:5001/teams", { headers: { Authorization: token } });
+        const res = await axios.get("https://wandr-travelapp.onrender.com/teams", { headers: { Authorization: token } });
         setTeams(res.data.teams);
         if (res.data.teams.length > 0) setSelectedTeam(res.data.teams[0]);
       } catch { toast.error("Failed to load teams"); }
@@ -60,7 +60,7 @@ function Chat({ toggleTheme }) {
 
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`http://localhost:5001/teams/${selectedTeam._id}/messages`, { headers: { Authorization: token } });
+        const res = await axios.get(`https://wandr-travelapp.onrender.com/teams/${selectedTeam._id}/messages`, { headers: { Authorization: token } });
         setMessages(res.data.messages);
       } catch { toast.error("Failed to load messages"); }
     };
