@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
-import "../styles/home.css";
+import "../styles/Home.css";
 
 const destinations = [
   { name: "Santorini", country: "Greece", emoji: "🏛️", tag: "Island Dream" },

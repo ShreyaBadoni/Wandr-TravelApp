@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "../styles/dashboard.css";
-import "../styles/profile.css";
+import "../styles/Profile.css";
 
 function Profile({ toggleTheme }) {
   const [isEditing, setIsEditing]   = useState(false);
