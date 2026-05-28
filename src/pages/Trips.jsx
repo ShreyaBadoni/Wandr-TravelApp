@@ -4,7 +4,7 @@ import UserAvatar from "../components/UserAvatar";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "../styles/dashboard.css";
-import "../styles/trips.css";
+import "../styles/Trips.css";
 
 const CATEGORY_EMOJI = { Food:"🍽️", Transport:"🚗", Stay:"🏨", Activities:"🎯", Shopping:"🛍️", General:"📋", Other:"💡" };
 
